@@ -2,6 +2,7 @@ import {databaseManager} from "@/db";
 import {
   serializeToSQLiteDateTimeString,
   deserializeFromSQLiteDateTimeString,
+  formatDate,
 } from "@/lib/convert_date";
 import {User} from "@/models/user";
 import {Like} from "@/models/like";
@@ -11,6 +12,7 @@ export interface PostRawData {
   content: string;
   user_id: number;
   updated_at: string;
+  created_at: string;
 }
 /* eslint-enable camelcase */
 
@@ -25,7 +27,8 @@ export class Post {
     return new Post(
       data.content,
       data.user_id,
-      deserializeFromSQLiteDateTimeString(data.updated_at)
+      deserializeFromSQLiteDateTimeString(data.updated_at),
+      formatDate(new Date(data.created_at))
     );
   }
 
@@ -38,7 +41,8 @@ export class Post {
   constructor(
     public content: string,
     public userId: number,
-    public updatedAt?: Date
+    public updatedAt?: Date,
+    public createdAt?: string
   ) {}
 
   async save(): Promise<void> {
@@ -127,7 +131,7 @@ export class Post {
   static async find(postId: number): Promise<Post | undefined> {
     const db = await databaseManager.getInstance();
     const postRowData = await db.get<PostRawDataWithId>(
-      "SELECT p.id, p.content, p.user_id, p.updated_at FROM posts p WHERE p.id=?",
+      "SELECT p.id, p.content, p.user_id, p.updated_at, p.created_at FROM posts p WHERE p.id=?",
       [postId]
     );
     return postRowData && Post.fromRawDataWithId(postRowData);

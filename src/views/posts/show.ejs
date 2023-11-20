@@ -8,6 +8,9 @@
       <p data-test="post-content">
         <%= post.content %>
       </p>
+      <p data-test="post-time" class="post-time">
+        <%= post.createdAt %>
+      </p>
       <% if(!hasLiked){ %>
         <form action="/likes/<%= post.id %>" method="POST" data-test="form-like">
           <button type="submit" data-test="submit-like" class="like-btn like">
